@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Flip</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="spade">&#9824;</string>
+    <string name="heart">&#9829;</string>
+    <string name="club">&#9827;</string>
+    <string name="diamond">&#9830;</string>
+    <string name="rank1">1</string>
+    <string name="rank2">2</string>
+    <string name="rank3">3</string>
+    <string name="rank4">4</string>
+    <string name="rank5">5</string>
+    <string name="rank6">6</string>
+    <string name="rank7">7</string>
+    <string name="rank8">8</string>
+    <string name="rank9">9</string>
+    <string name="rank10">10</string>
+    <string name="rank11">J</string>
+    <string name="rank12">Q</string>
+    <string name="rank13">K</string>
+
+</resources>
