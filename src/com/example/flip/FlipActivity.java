@@ -1,80 +1,86 @@
 package com.example.flip;
 
 import android.app.Activity;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 public class FlipActivity extends Activity {
 
-	private ImageView img;
-	private FrameLayout layout;
-	private Deck deck;
-	private TrumpView trumpView1;
-	private TrumpView trumpView2;
-	private FrameLayout.LayoutParams params;
-	private boolean flag = true;
-	private boolean anim = true;
-	
-	private int count=0;
+	private FrameLayout layout;// レイアウト
+	private Deck deck;// トランプ1組
+	private TrumpView trumpView1;// トランプ画像1
+	private TrumpView trumpView2;// トランプ画像2
+	private FrameLayout.LayoutParams params;// レイアウトのパラメーター
+	private boolean flag = true;// 表と裏のどちらが表示されているか判断
+	private boolean anim = true;// アニメーション中はfalseとなり画像をクリックできない
 
-	private float centerX;
-	private float centerY;
+	private int count = 0;//0～51まで増加、トランプの枚数を管理
 
-	private long time = 250;
+	private float centerX;// Y軸回転の中心点(X座標)を設定
+	private float centerY;// Y軸回転の中心点(Y座標)を設定
+
+	private long time = 250;// Y軸回転のアニメーションスピード
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE); // タイトルバーを非表示にする
 		setContentView(R.layout.activity_flip);
 
+		// メインレイアウトのインスタンスを取得
 		layout = (FrameLayout) findViewById(R.id.mainLayout);
 
-		Resources r = getResources();
-		Bitmap bmp = BitmapFactory.decodeResource(r, R.drawable.front);
-		img = new ImageView(this.getApplicationContext());
-		img.setImageBitmap(bmp);
-
+		// トランプ1組(52枚)を取得
 		deck = new Deck(this.getApplicationContext());
+		
+		// トランプの画像を表示させるカスタムビューのインスタンス取得
 		trumpView1 = new TrumpView(this.getApplicationContext());
 		trumpView2 = new TrumpView(this.getApplicationContext());
 
+		// トランプの画像を生成
 		trumpView1 = (TrumpView) trumpView1.addTrumpView(deck, count, this.getApplicationContext());
-		trumpView2 = (TrumpView) trumpView2.addTrumpView(deck, count+1, this.getApplicationContext());
+		trumpView2 = (TrumpView) trumpView2.addTrumpView(deck, count + 1, this.getApplicationContext());
 
+		// レイアウトのパラメーターを設定
 		params =
 				new FrameLayout.LayoutParams(trumpView1.getTrumpWidth(), trumpView1.getTrumpHeight(), Gravity.CENTER);
 
+		// Y軸回転の中心点を設定
 		centerX = trumpView1.getTrumpWidth() / 2;
 		centerY = trumpView1.getTrumpHeight();
+		
+		// レイアウトにトランプ画像1と2を追加する
 		layout.addView(trumpView1, params);
 		layout.addView(trumpView2, params);
+		// トランプ画像2は一時的に非表示
 		trumpView2.setVisibility(View.INVISIBLE);
+		
+		// カウントを加算する
 		count++;
 
-		//		layout.addView(img, params);
-		//		img.setVisibility(View.INVISIBLE);
-
+		// トランプ画像をクリックしたと時の処理1
 		trumpView1.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				if (anim) {
-										
+					// アニメーション中にクリックできないようfalseに変更する
+					anim = false;
+					
+					// トランプ画像2をレイアウトから削除する
 					layout.removeView(trumpView2);
+					// トランプ画像2に次に表示されるトランプを格納する
 					trumpView2 = (TrumpView) trumpView2.addTrumpView(deck, count, FlipActivity.this);
 					layout.addView(trumpView2, params);
 					trumpView2.setVisibility(View.INVISIBLE);
 
-					anim = false;
+					
+					// Y軸回転(前半)
 					Rotate3dAnimation rotation = new Rotate3dAnimation(0, 90, centerX, centerY, 0f, true);
 					rotation.setDuration(time);
 					trumpView1.startAnimation(rotation);
@@ -84,36 +90,26 @@ public class FlipActivity extends Activity {
 			}
 		});
 
+		// トランプ画像をクリックしたと時の処理1
 		trumpView2.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				if (anim) {
+					// アニメーション中にクリックできないようfalseに変更する
+					anim = false;
 					
+					// トランプ画像1をレイアウトから削除する
 					layout.removeView(trumpView1);
+					// トランプ画像1に次に表示されるトランプを格納する
 					trumpView1 = (TrumpView) trumpView1.addTrumpView(deck, count, FlipActivity.this);
 					layout.addView(trumpView1, params);
 					trumpView1.setVisibility(View.INVISIBLE);
-					
-					anim = false;
+
+					// Y軸回転(前半)
 					Rotate3dAnimation rotation = new Rotate3dAnimation(0, 90, centerX, centerY, 0f, true);
 					rotation.setDuration(time);
 					trumpView2.startAnimation(rotation);
-					rotation.setAnimationListener(backlistener);
-
-				}
-			}
-		});
-
-		img.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (anim) {
-					anim = false;
-					Rotate3dAnimation rotation = new Rotate3dAnimation(0, 90, centerX, centerY, 0f, true);
-					rotation.setDuration(time);
-					img.startAnimation(rotation);
 					rotation.setAnimationListener(backlistener);
 
 				}
@@ -135,12 +131,7 @@ public class FlipActivity extends Activity {
 		@Override
 		public void onAnimationEnd(Animation animation) {
 
-			//			trumpView1.setVisibility(View.INVISIBLE);
-			//			Rotate3dAnimation rotation = new Rotate3dAnimation(90, 180, centerX, centerY, 0f, false);
-			//			rotation.setDuration(time);
-			//			img.startAnimation(rotation);
-			//			rotation.setAnimationListener(listener);
-
+			// Y軸回転(後半)
 			trumpView1.setVisibility(View.INVISIBLE);
 			Rotate3dAnimation rotation = new Rotate3dAnimation(270, 360, centerX, centerY, 0f, false);
 			rotation.setDuration(time);
@@ -162,13 +153,7 @@ public class FlipActivity extends Activity {
 
 		@Override
 		public void onAnimationEnd(Animation animation) {
-
-			//			img.setVisibility(View.INVISIBLE);
-			//			Rotate3dAnimation rotation = new Rotate3dAnimation(270, 360, centerX, centerY, 0f, false);
-			//			rotation.setDuration(time);
-			//			trumpView1.startAnimation(rotation);
-			//			rotation.setAnimationListener(listener);
-
+			// Y軸回転(後半)
 			trumpView2.setVisibility(View.INVISIBLE);
 			Rotate3dAnimation rotation = new Rotate3dAnimation(270, 360, centerX, centerY, 0f, false);
 			rotation.setDuration(time);
@@ -177,6 +162,7 @@ public class FlipActivity extends Activity {
 
 		}
 	};
+	
 	private AnimationListener listener = new AnimationListener() {
 
 		@Override
@@ -191,20 +177,23 @@ public class FlipActivity extends Activity {
 		public void onAnimationEnd(Animation animation) {
 
 			if (flag) {
-				//				img.setVisibility(View.VISIBLE);
+				// Y軸回転終了後に画像を表示
 				trumpView2.setVisibility(View.VISIBLE);
-
 				flag = false;
 
 			} else {
+				// Y軸回転終了後に画像を表示
 				trumpView1.setVisibility(View.VISIBLE);
 				flag = true;
 
 			}
-			if(count==51){
-				count=0;
-			}else{
-			count++;}
+			// カウントの加算処理
+			if (count == 51) {
+				count = 0;
+			} else {
+				count++;
+			}
+			// アニメーションの終了
 			anim = true;
 
 		}
