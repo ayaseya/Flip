@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -14,7 +16,6 @@ public class TrumpView extends LinearLayout {
 	private int number; // 1～13までのトランプの数字を格納する変数
 
 	private String suit; // トランプの図柄の文字列を格納する変数
-	private CheckDevice cd;
 	private int size;
 
 	private int trumpWidth;
@@ -67,19 +68,19 @@ public class TrumpView extends LinearLayout {
 
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(trumpWidth, trumpHeight);
 
-		if (size > 100) {
+				if (size > 100) {
+		
+					tv.setTextSize(size / 6);
+					tv1.setTextSize(size / 6);
+					tv2.setTextSize(size / 4);
+				} else if (size < 100) {
+					tv.setTextSize((size - 10) / 2);
+					tv1.setTextSize((size - 10) / 2);
+					tv2.setTextSize(size - 10);
+				}
 
-			tv.setTextSize(size / 6);
-			tv1.setTextSize(size / 6);
-			tv2.setTextSize(size / 4);
-		} else if (size < 100) {
-			tv.setTextSize((size - 10) / 2);
-			tv1.setTextSize((size - 10) / 2);
-			tv2.setTextSize(size - 10);
-		}
 
 		color = Color.BLACK;
-		
 
 		if (suit == context.getResources().getString(R.string.heart) ||
 				suit == context.getResources().getString(R.string.diamond)) {
@@ -123,12 +124,18 @@ public class TrumpView extends LinearLayout {
 
 	private void fixDisplay(Context context) {
 
-		cd = new CheckDevice(context);
+		// Activityを継承していないため、getWindowManager()メソッドは利用できない
+		// Displayクラスのインスタンスを取得するため
+		// 引数のContextを使用してWindowManagerを取得する
+		WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+
+		// Displayインスタンスを取得する
+		Display display = wm.getDefaultDisplay();
 
 		//		size = (cd.getWidth() - 60) / 5;
-		size = cd.getWidth() / 4;
-		trumpWidth = size;
-		trumpHeight = (int) (size * 1.5);
+		size = display.getWidth() / 4;
+		trumpWidth = display.getWidth() / 4;
+		trumpHeight = (int) (trumpWidth * 1.5);
 
 	}
 
